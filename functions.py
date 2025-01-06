@@ -70,3 +70,34 @@ def detect_white_hough(board):
 
     circles = cv2.HoughCircles(whiteboard,cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
     return circles
+
+def orientation(p, q, r):
+    """Return orientation of the triplet (p, q, r)."""
+    return (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1])
+
+def on_segment(p, q, r):
+    """Check if point r lies on segment pq."""
+    return min(p[0], q[0]) <= r[0] <= max(p[0], q[0]) and min(p[1], q[1]) <= r[1] <= max(p[1], q[1])
+
+def do_lines_intersect(A, B, C, D):
+    """Return True if line segments AB and CD intersect."""
+    o1 = orientation(A, B, C)
+    o2 = orientation(A, B, D)
+    o3 = orientation(C, D, A)
+    o4 = orientation(C, D, B)
+
+    # General case: Check if the segments straddle each other
+    if o1 * o2 < 0 and o3 * o4 < 0:
+        return True
+
+    # Special cases: Check collinear cases where points lie on each other
+    if o1 == 0 and on_segment(A, B, C):
+        return True
+    if o2 == 0 and on_segment(A, B, D):
+        return True
+    if o3 == 0 and on_segment(C, D, A):
+        return True
+    if o4 == 0 and on_segment(C, D, B):
+        return True
+
+    return False
